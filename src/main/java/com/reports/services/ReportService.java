@@ -17,6 +17,6 @@ public interface ReportService {
 	
 	boolean exportExcel(HttpServletResponse response) throws Exception;
 	
-	boolean exportPdf();
+	boolean exportPdf(HttpServletResponse response) throws Exception;
 }
 

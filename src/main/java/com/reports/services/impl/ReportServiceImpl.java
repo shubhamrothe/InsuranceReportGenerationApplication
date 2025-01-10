@@ -1,7 +1,5 @@
 package com.reports.services.impl;
 
-import java.io.File;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -15,6 +13,13 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Example;
 import org.springframework.stereotype.Service;
 
+import com.lowagie.text.Document;
+import com.lowagie.text.Font;
+import com.lowagie.text.FontFactory;
+import com.lowagie.text.PageSize;
+import com.lowagie.text.Paragraph;
+import com.lowagie.text.pdf.PdfPTable;
+import com.lowagie.text.pdf.PdfWriter;
 import com.reports.entities.CitizenPlan;
 import com.reports.repositories.CitizenPlanRepo;
 import com.reports.rrquest.SearchRequest;
@@ -124,8 +129,47 @@ public class ReportServiceImpl implements ReportService {
 	} 
 
 	@Override
-	public boolean exportPdf() {
-		return false;
+	public boolean exportPdf(HttpServletResponse response) throws IOException {
+		Document document = new Document(PageSize.A4);
+		PdfWriter.getInstance(document, response.getOutputStream());
+		document.open();
+		//Creating font
+		//Setting font style and size
+		Font fontTitle = FontFactory.getFont(FontFactory.TIMES_ROMAN);
+		fontTitle.setSize(20);
+		//Creating Paragraph
+		Paragraph p= new Paragraph("Citizen's Plan Information", fontTitle);
+		//Aligning the paragraph in document
+		p.setAlignment(Paragraph.ALIGN_CENTER);
+		//Adding created paragraph in document
+		document.add(p);	
+		
+		PdfPTable table = new PdfPTable(8);
+		table.setSpacingBefore(10);
+		table.addCell("Id");
+		table.addCell("Holder Name");
+		table.addCell("Gender");
+		table.addCell("Plan Name");
+		table.addCell("Plan Status");
+		table.addCell("Plan StartDate");
+		table.addCell("Plan EndDate");
+		table.addCell("Benefit Amount");
+		
+		List<CitizenPlan> plans = this.repo.findAll();
+		
+		for(CitizenPlan plan:plans) {
+			table.addCell(String.valueOf(plan.getCitizenId()));
+			table.addCell(plan.getCitizenName());
+			table.addCell(plan.getGender());
+			table.addCell(plan.getPlanName());
+			table.addCell(plan.getPlanStatus());
+			table.addCell(plan.getPlanStartDate() +" ");
+			table.addCell(plan.getPlanEndDate()+" ");
+			table.addCell(String.valueOf(plan.getBenefitAmt()));	
+		}
+		document.add(table);
+		document.close();
+		return true;
 	}
 
 }

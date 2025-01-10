@@ -13,12 +13,16 @@ import com.reports.entities.CitizenPlan;
 import com.reports.rrquest.SearchRequest;
 import com.reports.services.ReportService;
 
+import jakarta.servlet.http.HttpServletResponse;
+
 @Controller
 public class ReportController {
 
 	@Autowired
 	private ReportService service;
-	
+	/*
+	 * This method is used to load index page
+	 * */
 	
 	@GetMapping("/")
 	public String indexPage(Model model) {
@@ -33,8 +37,6 @@ public class ReportController {
 		model.addAttribute("status", this.service.getPlanStatuses());
 	}
 	
-
-
 	@PostMapping("/search")
 	public String handleSearch(@ModelAttribute("search") SearchRequest search, Model model) {
 		//System.out.println(request);
@@ -44,5 +46,12 @@ public class ReportController {
 		return "index" ;
 	}
 	
+	@GetMapping("/excel")
+	public void excelExport(HttpServletResponse response) throws Exception {
+		response.setContentType("application/octet-stream");
+		response.addHeader("Content-Disposition","attachment;filename=plans.xlsx");
+		
+		this.service.exportExcel(response);
+	}
 	
 }

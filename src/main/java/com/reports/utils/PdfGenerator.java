@@ -1,5 +1,7 @@
 package com.reports.utils;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.List;
 
@@ -20,9 +22,12 @@ import jakarta.servlet.http.HttpServletResponse;
 @Component
 public class PdfGenerator {
 
-	public void generate(HttpServletResponse response, List<CitizenPlan> plans) throws DocumentException, IOException {
+	public void generate(HttpServletResponse response, List<CitizenPlan> plans, File f) throws DocumentException, IOException {
 		Document document = new Document(PageSize.A4);
+		
 		PdfWriter.getInstance(document, response.getOutputStream());
+		PdfWriter.getInstance(document, new FileOutputStream(f));
+		 
 		document.open();
 		//Creating font
 		//Setting font style and size

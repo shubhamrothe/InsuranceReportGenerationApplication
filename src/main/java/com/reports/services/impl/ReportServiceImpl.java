@@ -1,5 +1,6 @@
 package com.reports.services.impl;
 
+import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -13,6 +14,7 @@ import com.reports.entities.CitizenPlan;
 import com.reports.repositories.CitizenPlanRepo;
 import com.reports.rrquest.SearchRequest;
 import com.reports.services.ReportService;
+import com.reports.utils.EmailUtils;
 import com.reports.utils.ExcelGenerator;
 import com.reports.utils.PdfGenerator;
 
@@ -29,6 +31,9 @@ public class ReportServiceImpl implements ReportService {
 
 	@Autowired
 	private PdfGenerator pdfGenerator;
+	
+	@Autowired
+	private EmailUtils emailUtils;
 	
 	@Override
 	public List<String> getPlanNames() {
@@ -76,15 +81,34 @@ public class ReportServiceImpl implements ReportService {
 
 	@Override
 	public boolean exportExcel(HttpServletResponse response) throws Exception {		
+		File f = new File("Plans.xls");
+		
 		List<CitizenPlan> plans = this.repo.findAll();
-		this.excelGenerator.generate(response, plans);
+		this.excelGenerator.generate(response, plans, f);
+		
+		String subject ="Test mail subject";
+		String body="<h1>Test mail body</h1>";
+		String to ="shubhamrothe005@gmail.com";
+		
+		emailUtils.sendEmail(subject, body, to,f);
+		
+		f.delete();
 		return true;
 	} 
 
 	@Override
 	public boolean exportPdf(HttpServletResponse response) throws IOException {
+		File f = new File("Plans.pdf"); 
+		
 		List<CitizenPlan> plans = this.repo.findAll();
-		this.pdfGenerator.generate(response, plans);
+		this.pdfGenerator.generate(response, plans, f);
+		String subject ="Test mail subject";
+		String body="<h1>Test mail body</h1>";
+		String to ="shubhamrothe005@gmail.com";
+		
+		emailUtils.sendEmail(subject, body, to, f);
+		
+		f.delete();
 		return true;
 	}
 
